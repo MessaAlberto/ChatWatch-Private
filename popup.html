@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="script-src 'self'; object-src 'self'">
+  <title>ChatWatch Private</title>
+  <link rel="stylesheet" href="popup.css">
+  <script src="platform.js" defer></script>
+  <script src="popup.js" defer></script>
+</head>
+<body>
+  <main class="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brandmark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M3 12h4l2.2-5.5L13 18l2.6-7H21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div>
+          <div class="brandname">ChatWatch<span class="brandname-light"> private</span></div>
+          <div class="brand-subtitle">Your conversations, your control.</div>
+        </div>
+      </div>
+      <div class="privacy-chip" title="Nessun invio dei dati dell'estensione a servizi esterni">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 22s8-3.6 8-10V5l-8-3-8 3v7c0 6.4 8 10 8 10Z" stroke="currentColor" stroke-width="1.8"/><path d="m9 12 2 2 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        LOCAL
+      </div>
+    </header>
+
+    <section class="hero" aria-label="Panoramica attività">
+      <div class="hero-glow" aria-hidden="true"></div>
+      <div class="hero-topline"><span class="live-dot"></span> ACTIVITY CENTER <span class="hero-line"></span> LIVE</div>
+      <div class="metrics">
+        <div class="metric"><span id="count-monitored">0</span><small>Monitorate</small></div>
+        <div class="metric-separator"></div>
+        <div class="metric"><span id="count-running">0</span><small>In corso</small></div>
+        <div class="metric-separator"></div>
+        <div class="metric"><span id="count-ready">0</span><small>Completate</small></div>
+      </div>
+      <div class="hero-bottom"><span>Solo le chat che scegli tu</span><div class="bars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
+    </section>
+
+    <section class="conversations" aria-labelledby="conversations-title">
+      <div class="section-header">
+        <div><div class="section-eyebrow">WORKSPACE</div><h1 id="conversations-title">Le tue chat <span id="tab-count" class="small-count">0</span></h1></div>
+        <button id="refresh" class="icon-button" type="button" title="Aggiorna elenco" aria-label="Aggiorna elenco">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M20 7v5h-5M4 17v-5h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M5.5 9A7 7 0 0 1 18.4 7L20 12M4 12l1.6 5A7 7 0 0 0 18.5 15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <div class="filters" role="group" aria-label="Filtro chat">
+        <button class="filter active" data-filter="all" aria-pressed="true" type="button">Tutte</button>
+        <button class="filter" data-filter="monitored" aria-pressed="false" type="button">Monitorate</button>
+      </div>
+      <div id="tab-list" class="tab-list" aria-live="polite">
+        <div class="loading">Ricerca delle schede ChatGPT...</div>
+      </div>
+      <p id="error" class="error" hidden></p>
+      <button id="check-detector" class="diagnostics-button" type="button">Diagnostica rilevamento <span aria-hidden="true">↗</span></button>
+      <div id="detector-result" class="diagnostic" role="status" aria-live="polite" hidden></div>
+    </section>
+
+    <section class="settings" aria-label="Preferenze notifiche">
+      <div class="settings-heading"><span>PRIVACY & NOTIFICHE</span><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3a3 3 0 0 0-3 3v1a7 7 0 0 0-4 6v3l-2 2h18l-2-2v-3a7 7 0 0 0-4-6V6a3 3 0 0 0-3-3Zm-2 18a2 2 0 0 0 4 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <label class="setting-row">
+        <span class="setting-copy"><strong>Mostra il titolo della chat</strong><small>Disattivato: notifiche senza dettagli</small></span>
+        <input id="show-titles" class="switch-input" type="checkbox" aria-label="Mostra il titolo nelle notifiche"><span class="switch-track" aria-hidden="true"></span>
+      </label>
+      <button id="test-notification" type="button" class="test-button"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m5 12 4 4L19 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> Verifica notifiche <span aria-hidden="true">↗</span></button>
+      <div id="notification-result" class="diagnostic" role="status" aria-live="polite" hidden></div>
+      <p id="notification-help" class="notification-help" aria-live="polite">Rilevamento del sistema operativo…</p>
+    </section>
+
+    <footer><span><span class="footer-dot"></span> 100% locale · Nessun account aggiuntivo</span><span>v1.1.1</span></footer>
+  </main>
+</body>
+</html>
