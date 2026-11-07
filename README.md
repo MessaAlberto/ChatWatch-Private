@@ -10,7 +10,9 @@ A lightweight, local-first Chrome extension that lets you select which open Chat
 
 </div>
 
-![ChatWatch Private popup showing three sample conversations and monitoring controls](docs/screenshots/popup.png)
+<p align="center">
+  <img src="docs/screenshots/popup.png" alt="ChatWatch Private popup showing three sample conversations and monitoring controls" width="250">
+</p>
 
 > [!NOTE]
 > This is an independent, unofficial project. It is not affiliated with or endorsed by OpenAI. The preview uses fictional conversation titles.
