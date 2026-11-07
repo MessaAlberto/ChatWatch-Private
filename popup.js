@@ -3,10 +3,12 @@
 const tabList = document.getElementById("tab-list");
 const errorBox = document.getElementById("error");
 const titleSwitch = document.getElementById("show-titles");
+const soundSwitch = document.getElementById("sound-enabled");
+const soundTestButton = document.getElementById("test-sound");
 const detectorResult = document.getElementById("detector-result");
 let filter = "all";
 let busy = new Set();
-let latest = { tabs: [], showTitles: false };
+let latest = { tabs: [], showTitles: false, soundEnabled: true };
 let refreshing = false;
 
 function el(tag, className, text) {
@@ -43,6 +45,8 @@ function updateView() {
   document.getElementById("count-ready").textContent = enabled.filter((tab) => tab.phase === "ready").length;
   document.getElementById("tab-count").textContent = all.length;
   if (document.activeElement !== titleSwitch) titleSwitch.checked = latest.showTitles;
+  if (document.activeElement !== soundSwitch) soundSwitch.checked = latest.soundEnabled;
+  soundTestButton.disabled = !latest.soundEnabled;
 
   const selected = all.filter((tab) => filter === "all" || tab.enabled);
   selected.sort((a, b) => Number(b.enabled) - Number(a.enabled) || Number(b.active) - Number(a.active) || a.id - b.id);
@@ -141,6 +145,33 @@ titleSwitch.addEventListener("change", async () => {
   }
 });
 
+
+soundSwitch.addEventListener("change", async () => {
+  const enabled = soundSwitch.checked;
+  try {
+    const result = await chrome.runtime.sendMessage({ type: "SET_SOUND_ENABLED", enabled });
+    if (!result?.ok) throw new Error("Impossibile salvare la preferenza audio.");
+    latest.soundEnabled = enabled;
+    updateView();
+  } catch (error) {
+    soundSwitch.checked = !enabled;
+    errorBox.textContent = error.message;
+    errorBox.hidden = false;
+  }
+});
+
+soundTestButton.addEventListener("click", async () => {
+  soundTestButton.disabled = true;
+  try {
+    const result = await chrome.runtime.sendMessage({ type: "TEST_SOUND" });
+    if (!result?.ok) throw new Error(result?.error || "Riproduzione non disponibile.");
+    showNotificationResult("Suono di prova inviato", "Se non hai sentito il segnale, controlla l'uscita audio e il volume del sistema.");
+  } catch (error) {
+    showNotificationResult("Suono non disponibile", error.message, true);
+  } finally {
+    soundTestButton.disabled = !latest.soundEnabled;
+  }
+});
 
 function renderDiagnostics() {
   const monitored = (latest.tabs || []).filter((tab) => tab.enabled);

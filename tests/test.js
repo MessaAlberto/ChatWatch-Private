@@ -39,6 +39,8 @@ async function runBackgroundTests() {
     },
     runtime: {
       getURL(relativePath) { return `chrome-extension://test/${relativePath}`; },
+      async getContexts() { return [{ contextType: "OFFSCREEN_DOCUMENT" }]; },
+      async sendMessage() { return { ok: true }; },
       onMessage: { addListener(handler) { listeners.message = handler; } }
     },
     notifications: {
@@ -48,6 +50,7 @@ async function runBackgroundTests() {
       async clear() {},
       onClicked: { addListener(handler) { listeners.clicked = handler; } }
     },
+    offscreen: { async createDocument() {} },
     windows: { async update() {} },
     tabsEvent: {},
   };

@@ -3,6 +3,44 @@
 const CHAT_PATTERNS = ["https://chatgpt.com/*", "https://chat.openai.com/*"];
 const CHAT_ORIGINS = new Set(["https://chatgpt.com", "https://chat.openai.com"]);
 const notificationCooldown = new Map();
+const AUDIO_DOCUMENT = "offscreen.html";
+let creatingAudioDocument = null;
+
+async function ensureAudioDocument() {
+  const url = chrome.runtime.getURL(AUDIO_DOCUMENT);
+  if (creatingAudioDocument) return creatingAudioDocument;
+  creatingAudioDocument = (async () => {
+    const contexts = await chrome.runtime.getContexts({
+      contextTypes: ["OFFSCREEN_DOCUMENT"],
+      documentUrls: [url]
+    });
+    if (contexts.length) return;
+    await chrome.offscreen.createDocument({
+      url: AUDIO_DOCUMENT,
+      reasons: ["AUDIO_PLAYBACK"],
+      justification: "Play a brief local chime when a monitored ChatGPT response finishes."
+    });
+  })();
+  try {
+    await creatingAudioDocument;
+  } finally {
+    creatingAudioDocument = null;
+  }
+}
+
+async function playSound(force = false) {
+  const { soundEnabled } = await chrome.storage.local.get({ soundEnabled: true });
+  if (!force && soundEnabled !== true) return { ok: true, skipped: true };
+  try {
+    await ensureAudioDocument();
+    const response = await chrome.runtime.sendMessage({ target: "offscreen", type: "PLAY_CHIME" });
+    if (!response?.ok) throw new Error(response?.error || "Audio playback unavailable");
+    return { ok: true, skipped: false };
+  } catch (error) {
+    console.warn("ChatWatch sound unavailable:", error);
+    return { ok: false, error: error?.message || "Audio playback unavailable" };
+  }
+}
 
 function chatKey(url, tabId) {
   try {
@@ -54,7 +92,7 @@ async function notifyTabsToSync() {
 
 async function overview() {
   const tabs = await chrome.tabs.query({ url: CHAT_PATTERNS });
-  const settings = await chrome.storage.local.get({ showTitles: false });
+  const settings = await chrome.storage.local.get({ showTitles: false, soundEnabled: true });
   const result = await Promise.all(tabs.map(async (tab) => {
     const config = await getConfig(tab);
     let phase = "idle";
@@ -85,7 +123,7 @@ async function overview() {
       detector
     };
   }));
-  return { tabs: result.filter((tab) => tab.key), showTitles: settings.showTitles === true };
+  return { tabs: result.filter((tab) => tab.key), showTitles: settings.showTitles === true, soundEnabled: settings.soundEnabled !== false };
 }
 
 async function createCompletionNotification(tabId, sourceUrl) {
@@ -107,9 +145,11 @@ async function createCompletionNotification(tabId, sourceUrl) {
     message: "La risposta è terminata. Clicca per aprire la chat.",
     priority: 1
   });
+  await playSound();
 }
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message?.target === "offscreen") return false;
   (async () => {
     switch (message?.type) {
       case "GET_CONFIG": {
@@ -132,6 +172,15 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         if (sender.tab) return { ok: false };
         await chrome.storage.local.set({ showTitles: message.enabled === true });
         return { ok: true };
+      }
+      case "SET_SOUND_ENABLED": {
+        if (sender.tab || typeof message.enabled !== "boolean") return { ok: false };
+        await chrome.storage.local.set({ soundEnabled: message.enabled });
+        return { ok: true };
+      }
+      case "TEST_SOUND": {
+        if (sender.tab) return { ok: false, error: "Invalid sender" };
+        return playSound(true);
       }
       case "COMPLETED": {
         if (!sender.tab || !sender.url || !chatKey(sender.url, sender.tab.id)) return { ok: false };

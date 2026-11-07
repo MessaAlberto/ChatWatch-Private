@@ -2,6 +2,18 @@
 
 All notable changes to ChatWatch Private are documented here.
 
+## [1.2.0] - 2026-11-07
+
+### Added
+- Optional locally synthesized two-note completion sound (enabled by default).
+- Independent audio preview button and persistent sound preference in the popup.
+- Manifest V3 `offscreen` audio document, opened on demand without remote services.
+- Audio and notification regression tests.
+
+### Changed
+- New `offscreen` permission for sound playback, without expanding site access.
+- Documentation covering audio controls and troubleshooting.
+
 ## [1.1.1] - 2026-11-07
 
 ### Added

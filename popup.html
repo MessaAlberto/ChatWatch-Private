@@ -65,12 +65,17 @@
         <span class="setting-copy"><strong>Mostra il titolo della chat</strong><small>Disattivato: notifiche senza dettagli</small></span>
         <input id="show-titles" class="switch-input" type="checkbox" aria-label="Mostra il titolo nelle notifiche"><span class="switch-track" aria-hidden="true"></span>
       </label>
+      <label class="setting-row sound-row">
+        <span class="setting-copy"><strong>Suono al completamento</strong><small>Segnale audio locale, indipendente dal banner</small></span>
+        <input id="sound-enabled" class="switch-input" type="checkbox" aria-label="Riproduci un suono quando una chat completa la risposta" checked><span class="switch-track" aria-hidden="true"></span>
+      </label>
+      <button id="test-sound" type="button" class="sound-test-button">Ascolta il suono di prova</button>
       <button id="test-notification" type="button" class="test-button"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m5 12 4 4L19 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> Verifica notifiche <span aria-hidden="true">↗</span></button>
       <div id="notification-result" class="diagnostic" role="status" aria-live="polite" hidden></div>
       <p id="notification-help" class="notification-help" aria-live="polite">Rilevamento del sistema operativo…</p>
     </section>
 
-    <footer><span><span class="footer-dot"></span> 100% locale · Nessun account aggiuntivo</span><span>v1.1.1</span></footer>
+    <footer><span><span class="footer-dot"></span> 100% locale · Nessun account aggiuntivo</span><span>v1.2.0</span></footer>
   </main>
 </body>
 </html>

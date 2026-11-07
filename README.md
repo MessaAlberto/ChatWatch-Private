@@ -22,6 +22,7 @@ A lightweight, local-first Chrome extension that lets you select which open Chat
 - **Opt-in per conversation:** monitoring is off by default. Turn it on only for the chats you choose.
 - **Live activity overview:** see the number of monitored, running, and completed conversations in open ChatGPT tabs.
 - **Response completion notifications:** receive a Chrome desktop notification when a monitored response appears to finish.
+- **Optional completion sound:** an on-by-default, locally synthesized two-note chime plays when monitored responses finish. Toggle it off or preview it in the popup; it does not depend on the operating system's notification sound.
 - **Return to your conversation:** click a completion notification to focus its existing Chrome tab.
 - **Privacy by default:** notification titles hide chat names unless you explicitly enable them.
 - **Cross-platform help:** notification troubleshooting automatically adapts to macOS, Windows, Linux, and ChromeOS using Chrome's `runtime.getPlatformInfo()` API.
@@ -46,7 +47,7 @@ You **do not** need a Chrome Web Store developer account or a paid publishing re
 5. Click **Load unpacked** and select the directory containing `manifest.json`.
 6. Optionally pin ChatWatch to the Chrome toolbar using the extensions menu.
 7. Open or reload your ChatGPT tabs and click the ChatWatch icon.
-8. Enable monitoring for your chosen conversations; click **Verifica notifiche** to test notifications.
+8. Enable monitoring for your chosen conversations; click **Verifica notifiche** to test notifications and **Ascolta il suono di prova** to test audio.
 
 > [!IMPORTANT]
 > Do not delete or move the loaded extension directory after installing it. Chrome reads the extension files from that local path. A GitHub repository is a source-code host, not an automatic extension updater.
@@ -62,6 +63,8 @@ You **do not** need a Chrome Web Store developer account or a paid publishing re
 
 **Conversation identity:** for existing chats with a `/c/…` URL, the enabled state is saved locally by conversation ID, including across reopened tabs. A new chat without a saved ID is tracked temporarily within its tab; once ChatGPT assigns an ID, the setting is transferred to that conversation. Opening a different existing chat does not automatically enable it.
 
+**Sound:** the extension plays a short local chime by default. Turn off *Suono al completamento* for silent notifications. *Ascolta il suono di prova* checks audio independently of notification permissions. Audio plays through the current Chrome/system output device.
+
 **Notification title:** by default, the notification does not include the conversation title. The optional *Mostra il titolo della chat* setting reveals it on desktop notifications. Chat titles are displayed in the local popup so you can choose the correct tab.
 
 ## Desktop notifications and OS-specific troubleshooting
@@ -76,6 +79,8 @@ The popup detects the operating system and displays its appropriate settings pat
 | **Linux** | Desktop settings → **Notifications**; allow Chrome notifications and check Do Not Disturb. Paths vary across GNOME/KDE and distributions. |
 | **ChromeOS** | **Settings → Apps → Notifications**; check Chrome notifications and Do Not Disturb. |
 
+If banners appear but are silent, check the **Suono al completamento** toggle and press **Ascolta il suono di prova**. A separate `offscreen` document plays the chime through Web Audio because Manifest V3 service workers cannot play audio directly. The browser or OS may still mute audio.
+
 If the extension does not react to a ChatGPT tab, reload that tab (`⌘R` on Mac, `Ctrl+R` on Windows/Linux) and verify that the extension is enabled in `chrome://extensions`.
 
 The Chrome page `chrome://settings/content/notifications` controls **website** notification permissions. ChatWatch uses the **extension** notifications API, so website permission alone is not the same as the operating-system permission for Chrome.
@@ -86,6 +91,7 @@ The Chrome page `chrome://settings/content/notifications` controls **website** n
 | --- | --- |
 | `storage` | Saves selected conversation IDs and settings locally. New unsaved conversations use session storage. |
 | `notifications` | Creates desktop notifications. |
+| `offscreen` | Plays a locally generated chime from a short-lived hidden document, without reading page content or making network requests. |
 | `https://chatgpt.com/*`, `https://chat.openai.com/*` | Allows the content script to observe response-state UI elements only on ChatGPT domains. |
 
 - **No message body collection:** the detector inspects UI controls and state changes rather than sending or storing conversation text.
@@ -107,6 +113,9 @@ background.js  -- saved settings, tab routing, notifications
     |
     v
 Chrome desktop notifications
+    +
+    v
+offscreen.html + offscreen.js -- optional local sound
 
 popup.html + popup.js  -- selected conversations and diagnostics
 platform.js             -- OS-aware notification settings help
@@ -125,6 +134,8 @@ ChatWatch-Private/
 ├── background.js
 ├── content.js
 ├── manifest.json
+├── offscreen.html
+├── offscreen.js
 ├── platform.js
 ├── popup.css
 ├── popup.html
@@ -145,7 +156,7 @@ The extension uses **vanilla JavaScript** and has no runtime dependencies. The t
 npm test
 ```
 
-The tests check notification behavior, selected conversations, detector state transitions, popup element references, and OS-specific help. GitHub Actions runs the same tests on pushes and pull requests.
+The tests check notification behavior, sound settings and offscreen playback, selected conversations, detector state transitions, popup element references, and OS-specific help. GitHub Actions runs the same tests on pushes and pull requests.
 
 ### Updating your unpacked installation
 
@@ -162,7 +173,7 @@ Using the **same directory** helps Chrome retain the installed extension's ident
 - Chrome may suspend inactive tabs through Memory Saver, delaying detection.
 - The extension only monitors Chrome tabs in the local browser profile where it is installed; it cannot see conversations on other devices or in desktop/mobile apps.
 - Automated tests are not equivalent to full end-to-end validation with a live signed-in ChatGPT session.
-- Notifications are subject to Chrome and OS settings, including Focus / Do Not Disturb.
+- Notifications are subject to Chrome and OS settings, including Focus / Do Not Disturb. The optional audio cue can also be affected by system mute, output routing, and autoplay policies.
 
 ## Contributing
 

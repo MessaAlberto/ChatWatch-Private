@@ -20,3 +20,8 @@ button,input{font:inherit}button{cursor:pointer}button:focus-visible,input:focus
 .diagnostics-button{width:100%;margin-top:10px;padding:10px 12px;text-align:center;color:var(--aqua);background:#132632;border:1px solid #295060;border-radius:10px;font-size:11px;font-weight:650}.diagnostics-button:hover{border-color:#65c9c2}.diagnostics-button span{margin-left:5px}.diagnostic .sensor-row{padding:7px 0;border-top:1px solid #45605c55}.diagnostic .sensor-row:first-of-type{border-top:0}.diagnostic .sensor-name{font-weight:700;color:#e4f1f2}.diagnostic .sensor-data{font-size:10px;color:#b2cbd1;margin-top:2px;overflow-wrap:anywhere}
 
 .notification-help{font-size:10px;line-height:1.55;color:var(--muted);margin:10px 1px 0;overflow-wrap:anywhere}
+
+.sound-row{border-top:1px solid #293a45;padding-top:14px}
+.sound-test-button{width:100%;margin:0 0 10px;padding:9px 12px;border:1px solid #35515d;border-radius:10px;background:#142935;color:var(--aqua);font-size:11px;font-weight:650}
+.sound-test-button:hover{border-color:var(--aqua);background:#1b3440}
+.sound-test-button:disabled{opacity:.55;cursor:not-allowed}

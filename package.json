@@ -1,10 +1,10 @@
 {
   "name": "chatwatch-private",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "description": "Local-first ChatGPT completion notifications for selected Chrome tabs",
   "private": true,
   "scripts": {
-    "test": "node tests/test.js && node tests/test_popup_structure.js && node tests/test_platform.js"
+    "test": "node tests/test.js && node tests/test_popup_structure.js && node tests/test_platform.js && node tests/test_sound.js"
   },
   "engines": {
     "node": ">=18"
